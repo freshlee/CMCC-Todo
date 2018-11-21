@@ -1,0 +1,50 @@
+@import './antd-mobile.scss';
+@import './antd.scss';
+$theme: #108ee9;
+body {
+    background: #fafafa !important;
+}
+.global {
+    padding: 0 .2rem;
+    color: #454545;
+    .title-wrap {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .title {
+            border-left: 4px solid $theme;
+            font-size: .14rem;
+            margin: .2rem 0;
+            padding-left: .1rem;
+            color: $theme;
+        }
+    }
+    .card-wrap {
+        width: 100%;
+        .card {
+            padding: 0 .07rem;
+            border: 1px solid #dddddd;
+            background: #fff;
+            margin-bottom: .2rem;
+            p.title {
+                height: .3rem;
+                line-height: .3rem;
+                font-size: .12rem;
+                border-bottom: 1px solid #dddddd;
+                margin: 0;
+            }
+            .content {
+                padding: .05rem 0;
+                .content-item {
+                    height: .3rem;
+                    line-height: .3rem;
+                }
+                .state {
+                    &.success {
+    
+                    }
+                }
+            }
+        }
+    }
+}
