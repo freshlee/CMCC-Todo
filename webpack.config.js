@@ -45,7 +45,7 @@ module.exports = (env, argv) => ({
 				include: /node_modules/
 			},
 			{
-				test: /\.(scss)$/, //css打包 路径在plugins里
+				test: /\.(scss|css)$/, //css打包 路径在plugins里
 				use: [
 					argv.mode == "development" ? { loader: "style-loader"} :MiniCssExtractPlugin.loader,
 					{ loader: "css-loader", options: { url: false, sourceMap: true } },
@@ -104,10 +104,10 @@ module.exports = (env, argv) => ({
 	},
 	plugins: [
 		...htmlArr, // html插件数组
-		// new MiniCssExtractPlugin({ //分离css插件
-		// 	filename: "[name].css",
-		// 	chunkFilename: "[id].css"
-		// })
+		new MiniCssExtractPlugin({ //分离css插件
+			filename: "[name].css",
+			chunkFilename: "[id].css"
+		})
 	],
 	optimization: {
 		minimizer: [//压缩js
