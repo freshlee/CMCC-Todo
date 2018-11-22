@@ -1,2 +1,13 @@
 @import './antd-mobile.scss';
 @import './antd.scss';
+body {
+    background: #fafafa !important;
+}
+.am-textarea-control textarea {
+    &::placeholder {
+        font-size: 12px;
+    }
+}
+.button-wrap {
+    padding: 0 .1rem;
+}

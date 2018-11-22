@@ -3,18 +3,93 @@
  * @author: lee
  * @date: 2018-10-08
  */
+Date.prototype.format = function(format)
+{
+	var o = {
+	"M+" : this.getMonth()+1, //month
+	"d+" : this.getDate(),    //day
+	"h+" : this.getHours(),   //hour
+	"m+" : this.getMinutes(), //minute
+	"s+" : this.getSeconds(), //second
+	"q+" : Math.floor((this.getMonth()+3)/3),  //quarter
+	"S" : this.getMilliseconds() //millisecond
+	}
+	if(/(y+)/.test(format)) format=format.replace(RegExp.$1,
+	(this.getFullYear()+"").substr(4 - RegExp.$1.length));
+	for(var k in o)if(new RegExp("("+ k +")").test(format))
+	format = format.replace(RegExp.$1,
+	RegExp.$1.length==1 ? o[k] :
+	("00"+ o[k]).substr((""+ o[k]).length));
+ 	return format;
+}
 
 import React, { Component } from "react";
-import { NavBar, Icon } from 'antd-mobile';
+import { NavBar, Icon, Calendar, WhiteSpace, Button } from 'antd-mobile';
 import { Select } from 'antd';
+import axios from 'axios'
+function getQueryString(name) { 
+	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
+	var r = window.location.search.substr(1).match(reg); 
+	if (r != null) return unescape(r[2]); 
+	return null; 
+}
+let token = null
 export default class App extends Component {
-
-	componentDidMount() {
-
+	constructor (props) {
+		super(props)
+		this.state = {
+			show: false,
+			startDate: '',
+			endDate: '',
+			startDate_select: '',
+			endDate_select: ''
+		}
 	}
-
+	componentDidMount() {
+		const openid = getQueryString('openid')
+		axios.post('http://221.176.65.6:80/userapi/management/ssoRest/wxLogin', {
+			openid
+		}).then(res => {
+			token = res.data.token
+		})
+	}
+	setShow (state) {
+		this.setState({
+			show: state
+		})
+	}
+	onRangeSelect (end, start) {
+		this.setState({
+			startDate_select: start,
+			endDate_select: end
+		})
+	}
+	confirm () {
+		this.setState({
+			startDate: this.state.startDate_select,
+			endDate: this.state.endDate_select,
+			show: false
+		})
+	}
+	DateRange () {
+		let startDate = this.state.startDate
+		let endDate = this.state.endDate
+		startDate = new Date(startDate)
+		endDate = new Date(endDate)
+		return (this.state.startDate ? `${startDate.format('yyyy-MM-dd')}至${endDate.format('yyyy-MM-dd')}` : '请选择时间段')
+	}
+	search () {
+		axios.get('http://221.176.65.6:80/demandapi/demand/TravelApplyRest/restcloud/rest/demand/TravelApplyRest/findTraveApplyList', {
+			params: {
+				pageNo: 1,
+				pageSize: 10,
+				startDate: this.startDate,
+				endDate: this.endDate,
+				token
+			}
+		})
+	}
 	render() {
-
 		return (
 			<div>
 				<div className="index">
@@ -33,6 +108,10 @@ export default class App extends Component {
 								</Select>
 							</div>
 						</div>
+						<div className="changeDate">出差时间段 <span onClick={this.setShow.bind(this, true)}>{this.DateRange.call(this)}</span> </div>
+						<WhiteSpace></WhiteSpace>
+						<Button onClick={this.search.bind(this)} size="small" type="primary">查询</Button>
+						<WhiteSpace></WhiteSpace>
 						<div className="card-wrap">
 						{[1, 2, 3].map(item => {
 							return (
@@ -48,6 +127,12 @@ export default class App extends Component {
 						</div>
 					</div>
 				</div>
+				<Calendar
+					 visible={this.state.show}
+					 onSelect = {this.onRangeSelect.bind(this)}
+					 onConfirm = {this.confirm.bind(this)}
+					 onCancel = {this.setShow.bind(this, false)}
+				></Calendar>
 			</div>
 		);
 	}

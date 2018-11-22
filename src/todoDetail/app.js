@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from "react";
-import { NavBar, Icon, List, InputItem, WhiteSpace, Picker, Calendar } from 'antd-mobile';
+import { NavBar, Icon, List, InputItem, WhiteSpace, Button, Calendar, TextareaItem } from 'antd-mobile';
 import { Select } from 'antd';
 Date.prototype.format = function(format)
 {
@@ -44,7 +44,8 @@ export default class App extends Component {
 				startTime: '2018-09-01',
 				endTime: '2018-09-07',
 				startPos: '',
-				endPos: ''
+				endPos: '',
+				reason: '我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多'
 				
 			},
 			dict: {
@@ -92,46 +93,65 @@ export default class App extends Component {
                     <NavBar
 						icon={<Icon type="left"/>}
 					>李大钊发起的报销工单</NavBar>
-					<List renderHeader={() => 'Customize to focus'}>
+					<List renderHeader={() => '出差详情'}>
 						<InputItem
+						    moneyKeyboardAlign="right"
+						    disabled
 							clear
 							value={this.state.fromData.title}
 							onChange={(event) => this.handleChange.call(this, 'title', event)}
 							placeholder="标题"
-							ref={el => this.autoFocusInst = el}
-						>标题</InputItem>
+						><span style={{'color': '#454545', 'font-size': '16px'}}>标题</span></InputItem>
 						<InputItem
-							clear
+						    moneyKeyboardAlign="right"
+						    disabled
+							clear			
 							value={this.state.fromData.name}
 							onChange={(event) => this.handleChange.call(this, 'name', event)}
-							placeholder="申请人"
-							ref={el => this.autoFocusInst = el}
-						>申请人</InputItem>
-						<Picker data={this.state.dict.unit} value={this.state.fromData.unit} cols={1} className="forss" onChange={(event) => this.handleChange.call(this, 'unit', event)}>
-							<List.Item arrow="horizontal">所在科室</List.Item>
-						</Picker>
-						<List.Item arrow="horizontal" onClick={this.switchCalender.bind(this, true)} extra={`${this.state.fromData.startTime}至${this.state.fromData.endTime}`}>活动时间段</List.Item>
-						<Calendar
-							visible={this.state.showCalender}
-							onConfirm = {this.switchCalender.bind(this, false)}
-							onCancel = {this.switchCalender.bind(this, false)}
-							onSelect = {this.handleDate.bind(this)}
-						/>
+						><span style={{'color': '#454545', 'font-size': '16px'}}>申请人</span></InputItem>
 						<InputItem
+						    moneyKeyboardAlign="right"
+						    disabled
+							clear
+							value={this.state.fromData.unit}
+						><span style={{'color': '#454545', 'font-size': '16px'}}>申请人</span></InputItem>
+						<InputItem
+						    moneyKeyboardAlign="right"
+						    disabled
+							clear
+							value={`${this.state.fromData.startTime}至${this.state.fromData.endTime}`}
+						><span style={{'color': '#454545', 'font-size': '16px'}}>出差时间</span></InputItem>
+						<InputItem
+						    moneyKeyboardAlign="right"
+						    disabled
 							clear
 							value={this.state.fromData.startPos}
-							onChange={(event) => this.handleChange.call(this, 'startPos', event)}
-							placeholder="开始地点"
-							ref={el => this.autoFocusInst = el}
-						>开始地点</InputItem>
+						><span style={{'color': '#454545', 'font-size': '16px'}}>开始地点</span></InputItem>
 						<InputItem
+						    moneyKeyboardAlign="right"
+						    disabled
 							clear
 							value={this.state.fromData.endPos}
-							onChange={(event) => this.handleChange.call(this, 'endPos', event)}
-							placeholder="结束地点"
-							ref={el => this.autoFocusInst = el}
-						>结束地点</InputItem>
+						><span style={{'color': '#454545', 'font-size': '16px'}}>结束地点</span></InputItem>
 					</List>
+					<List renderHeader={() => '出差事由'} className="my-list">
+						<List.Item wrap><span style={{'font-size': '12px'}}>{this.state.fromData.reason}</span></List.Item>
+					</List>
+					<List renderHeader={() => '审批意见'} className="my-list">
+						<TextareaItem
+							placeholder='审批意见'
+							rows={5}
+							count={100}
+						/>
+					</List>
+					<div className="button-wrap">
+						<WhiteSpace></WhiteSpace>
+						<Button type="primary">同意</Button>
+						<WhiteSpace></WhiteSpace>
+						<Button type="primary">驳回</Button>
+						<WhiteSpace></WhiteSpace>
+						<Button type="primary">取消</Button>
+					</div>
 				</div>
 			</div>
 		);
