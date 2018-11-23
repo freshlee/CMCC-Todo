@@ -34,6 +34,12 @@ function getQueryString(name) {
 	return null; 
 }
 let token = null
+const EnumState = new Map()
+EnumState.set('0', '待审')
+EnumState.set('1', '中心领导审批中')
+EnumState.set('2', '审批通过')
+const StateOption = []
+
 export default class App extends Component {
 	constructor (props) {
 		super(props)
@@ -42,7 +48,9 @@ export default class App extends Component {
 			startDate: '',
 			endDate: '',
 			startDate_select: '',
-			endDate_select: ''
+			endDate_select: '',
+			list: [],
+			juedgeState: 0
 		}
 	}
 	componentDidMount() {
@@ -78,8 +86,17 @@ export default class App extends Component {
 		endDate = new Date(endDate)
 		return (this.state.startDate ? `${startDate.format('yyyy-MM-dd')}至${endDate.format('yyyy-MM-dd')}` : '请选择时间段')
 	}
+	stateChange (event) {
+		this.setState({
+			juedgeState: event
+		})
+	}
 	search () {
-		axios.get('http://221.176.65.6:80/demandapi/demand/TravelApplyRest/restcloud/rest/demand/TravelApplyRest/findTraveApplyList', {
+		const apiOption = new Map()
+		console.log(this.state.juedgeState, 'this.state.juedgeState')
+		apiOption.set(0, 'http://221.176.65.6:80/demandapi/demand/TravelApplyRest/findDaiBanList')
+		apiOption.set(1, 'http://221.176.65.6:80/demandapi/demand/TravelApplyRest/findYiBanList')
+		axios.get(apiOption.get(this.state.juedgeState), {
 			params: {
 				pageNo: 1,
 				pageSize: 10,
@@ -87,6 +104,10 @@ export default class App extends Component {
 				endDate: this.endDate,
 				token
 			}
+		}).then(({data}) => {
+			this.setState({
+				list: data.rows
+			})
 		})
 	}
 	render() {
@@ -100,26 +121,23 @@ export default class App extends Component {
 						<div className="title-wrap">
 							<div className="title">出差申请</div>
 							<div className="panel">
-								<Select defaultValue="lucy" style={{ width: 120 }}>
-									<Select.Option value="jack">Jack</Select.Option>
-									<Select.Option value="lucy">Lucy</Select.Option>
-									<Select.Option value="disabled" disabled>Disabled</Select.Option>
-									<Select.Option value="Yiminghe">yiminghe</Select.Option>
+								<Select defaultValue={0} style={{ width: 120 }} onSelect={this.stateChange.bind(this)}>
+									<Select.Option value={0}>审批列表</Select.Option>
+									<Select.Option value={1}>已审列表</Select.Option>
 								</Select>
 							</div>
 						</div>
-						<div className="changeDate">出差时间段 <span onClick={this.setShow.bind(this, true)}>{this.DateRange.call(this)}</span> </div>
 						<WhiteSpace></WhiteSpace>
 						<Button onClick={this.search.bind(this)} size="small" type="primary">查询</Button>
 						<WhiteSpace></WhiteSpace>
 						<div className="card-wrap">
-						{[1, 2, 3].map(item => {
+						{this.state.list.map((item, index) => {
 							return (
 								<div className="card">
-								<p className="title">标题:XXXX</p>
+								<p className="title">{item.title}</p>
 								<div className="content">
-								   <div className="content-item">申请时间: 2018-10-30</div>
-								   <div className="content-item">申请状态: <span className="state">成功</span></div>
+								   <div className="content-item">申请时间: {item.createTime}</div>
+								   <div className="content-item">申请状态: <span className="state">{EnumState.get(item.formStatus)}</span></div>
 								</div>
 							   </div>
 							)
