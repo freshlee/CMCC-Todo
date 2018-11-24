@@ -24,7 +24,7 @@ Date.prototype.format = function(format)
 }
 
 import React, { Component } from "react";
-import { NavBar, Icon, Calendar, WhiteSpace, Button } from 'antd-mobile';
+import { Calendar, WhiteSpace, PullToRefresh, Flex } from 'antd-mobile';
 import { Select } from 'antd';
 import axios from 'axios'
 function getQueryString(name) { 
@@ -35,9 +35,10 @@ function getQueryString(name) {
 }
 let token = null
 const EnumState = new Map()
-EnumState.set('0', '待审')
+EnumState.set('0', '科室经理审批中')
 EnumState.set('1', '中心领导审批中')
 EnumState.set('2', '审批通过')
+let CurrentPage = 0
 const StateOption = []
 
 export default class App extends Component {
@@ -59,6 +60,7 @@ export default class App extends Component {
 			openid
 		}).then(res => {
 			token = res.data.token
+			this.search()
 		})
 	}
 	setShow (state) {
@@ -89,62 +91,72 @@ export default class App extends Component {
 	stateChange (event) {
 		this.setState({
 			juedgeState: event
-		})
+		}, this.search)
 	}
-	search () {
-		const apiOption = new Map()
-		console.log(this.state.juedgeState, 'this.state.juedgeState')
+	search (isFresh) {
+		const apiOption = new Map() 
 		apiOption.set(0, 'http://221.176.65.6:80/demandapi/demand/TravelApplyRest/findDaiBanList')
 		apiOption.set(1, 'http://221.176.65.6:80/demandapi/demand/TravelApplyRest/findYiBanList')
 		axios.get(apiOption.get(this.state.juedgeState), {
 			params: {
-				pageNo: 1,
+				pageNo: CurrentPage = isFresh ? CurrentPage : 1 ,
 				pageSize: 10,
-				startDate: this.startDate,
-				endDate: this.endDate,
 				token
 			}
 		}).then(({data}) => {
+			CurrentPage += 1
+			if (isFresh) {
+				data.rows = this.state.list.concat(data.rows)
+			}
 			this.setState({
 				list: data.rows
 			})
 		})
 	}
+	toDetail (applyID) {
+		// console.log(`/todoDetail?openid=${getQueryString('openid')}&&applyID=${applyID}` )
+		window.location.href = `todoDetail.html?openid=${getQueryString('openid')}&&applyID=${applyID}` 
+	}
+	refresh () {
+		this.search(true)
+	}
 	render() {
 		return (
-			<div>
-				<div className="index">
-                    <NavBar
-						icon={<Icon type="left"/>}
-					>审批列表</NavBar>
-					<div className="global">
-						<div className="title-wrap">
-							<div className="title">出差申请</div>
-							<div className="panel">
-								<Select defaultValue={0} style={{ width: 120 }} onSelect={this.stateChange.bind(this)}>
-									<Select.Option value={0}>审批列表</Select.Option>
-									<Select.Option value={1}>已审列表</Select.Option>
-								</Select>
-							</div>
-						</div>
-						<WhiteSpace></WhiteSpace>
-						<Button onClick={this.search.bind(this)} size="small" type="primary">查询</Button>
-						<WhiteSpace></WhiteSpace>
-						<div className="card-wrap">
-						{this.state.list.map((item, index) => {
-							return (
-								<div className="card">
-								<p className="title">{item.title}</p>
-								<div className="content">
-								   <div className="content-item">申请时间: {item.createTime}</div>
-								   <div className="content-item">申请状态: <span className="state">{EnumState.get(item.formStatus)}</span></div>
-								</div>
-							   </div>
-							)
-						})}
+			<div className="global">
+				<Flex direction="column" align="stretch">
+					<div className="title-wrap">
+						<div className="title">出差申请</div>
+						<div className="panel">
+							<Select defaultValue={0} style={{ width: 120 }} onSelect={this.stateChange.bind(this)}>
+								<Select.Option value={0}>审批列表</Select.Option>
+								<Select.Option value={1}>已审列表</Select.Option>
+							</Select>
 						</div>
 					</div>
-				</div>
+					<WhiteSpace></WhiteSpace>
+					<Flex.Item flex="100%">
+						<div className="card-wrap">
+							<PullToRefresh onRefresh={this.refresh.bind(this)} direction="up"
+								style={{
+									height: '100%',
+									overflow: 'auto',
+								}}
+							>
+								{this.state.list.map((item, index) => {
+									return (
+										<div className="card" onClick={() => this.toDetail.call(this, item.applyId)}>
+										<p className="title">{item.title}</p>
+										<div className="content">
+										<div className="content-item">申请时间: {item.createTime}</div>
+										<div className="content-item">申请状态: <span className="state">{EnumState.get(item.formStatus)}</span></div>
+										</div>
+									</div>
+									)
+								})}
+							</PullToRefresh>
+						</div>
+					</Flex.Item>
+				</Flex>
 				<Calendar
 					 visible={this.state.show}
 					 onSelect = {this.onRangeSelect.bind(this)}

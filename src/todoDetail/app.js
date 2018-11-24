@@ -5,8 +5,9 @@
  */
 
 import React, { Component } from "react";
-import { NavBar, Icon, List, InputItem, WhiteSpace, Button, Calendar, TextareaItem } from 'antd-mobile';
+import { List, InputItem, WhiteSpace, Button, TextareaItem } from 'antd-mobile';
 import { Select } from 'antd';
+import axios from 'axios'
 Date.prototype.format = function(format)
 {
 	var o = {
@@ -33,23 +34,38 @@ function setFormData(value) {
 	  return descriptor
 	}
 }
+function getQueryString(name) { 
+	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
+	var r = window.location.search.substr(1).match(reg); 
+	if (r != null) return unescape(r[2]); 
+	return null; 
+}
+let token = null
+let applyID = null
+const EnumState = new Map()
+EnumState.set('0', '科室经理审批意见')
+EnumState.set('1', '中心领导审批意见')
+EnumState.set('2', '审批通过')
 export default class App extends Component {
 	constructor (props) {
 		super(props)
 		this.state = {
 			fromData: {
 				title: '',
-				name: 'lee',
-				unit: [],
-				startTime: '2018-09-01',
-				endTime: '2018-09-07',
+				name: '',
+				ouName: [],
+				createTime: '2018-09-01',
+				endDate: '2018-09-07',
 				startPos: '',
 				endPos: '',
-				reason: '我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多我和很多很多'
+				reason: '',
+				approvalRemark: '',
+				formStatus: 0,
+				travelApplyTasks: []
 				
 			},
 			dict: {
-				unit: [
+				ouName: [
 					{
 						label: '销售科',
 						value: 0,
@@ -71,6 +87,44 @@ export default class App extends Component {
 	}
 	
 	componentDidMount() {
+		applyID = getQueryString('applyID')
+		const openid = getQueryString('openid')
+		axios.post('http://221.176.65.6:80/userapi/management/ssoRest/wxLogin', {
+			openid
+		}).then(res => {
+			token = res.data.token
+			axios.get('http://221.176.65.6:80/demandapi/demand/TravelApplyRest/getTravelApplyByID', {params: {applyID, token}}).then(({data}) => {
+				console.log(data)
+				this.state.fromData.title = data.title
+				this.state.fromData.name = data.userName
+				this.state.fromData.ouName = data.ouName
+				this.state.fromData.createTime = data.createTime
+				this.state.fromData.endDate = data.endDate
+				this.state.fromData.startPos = data.startPlace
+				this.state.fromData.reason = data.travelReason
+				this.state.fromData.reason = data.travelReason
+				this.state.fromData.formStatus = data.formStatus
+				this.state.fromData.travelApplyTasks = data.travelApplyTasks
+				this.setState({
+					fromData: this.state.fromData
+				})
+			})
+		})
+	}
+	// 0-不同意 1-同意
+	judge (state) {
+		axios.post('http://221.176.65.6:80/demandapi/demand/TravelApplyRest/updateTravelApply', {
+			applyId: applyID,
+			state,
+			approvalRemark: this.state.fromData.approvalRemark,
+			formStatus: Number(this.state.fromData.formStatus) + 1,
+			token
+
+		}).then(res => {
+			window.history.back()
+		}).catch(() => {
+			alert("错误")
+		})
 	}
 	switchCalender (state) {
 		this.setState({
@@ -78,21 +132,16 @@ export default class App extends Component {
 		}) 
 	}
 	handleDate (start, end) {
-		console.log(start, end)
 		const startParse = new Date(start)
 		const endParse = new Date(end)
-		this.state.fromData.startTime = endParse.format('yyyy-MM-dd')
-		this.state.fromData.endTime = startParse.format('yyyy-MM-dd')
+		this.state.fromData.createTime = endParse.format('yyyy-MM-dd')
+		this.state.fromData.endDate = startParse.format('yyyy-MM-dd')
 		this.setState({fromData: this.state.fromData})
 	}
 	render() {
-		console.log(this.props)
 		return (
 			<div>
 				<div className="index">
-                    <NavBar
-						icon={<Icon type="left"/>}
-					>李大钊发起的报销工单</NavBar>
 					<List renderHeader={() => '出差详情'}>
 						<InputItem
 						    moneyKeyboardAlign="right"
@@ -101,57 +150,66 @@ export default class App extends Component {
 							value={this.state.fromData.title}
 							onChange={(event) => this.handleChange.call(this, 'title', event)}
 							placeholder="标题"
-						><span style={{'color': '#454545', 'font-size': '16px'}}>标题</span></InputItem>
+						><span style={{'color': '#454545', 'fontSize': '16px'}}>标题</span></InputItem>
 						<InputItem
 						    moneyKeyboardAlign="right"
 						    disabled
 							clear			
 							value={this.state.fromData.name}
 							onChange={(event) => this.handleChange.call(this, 'name', event)}
-						><span style={{'color': '#454545', 'font-size': '16px'}}>申请人</span></InputItem>
+						><span style={{'color': '#454545', 'fontSize': '16px'}}>申请人</span></InputItem>
 						<InputItem
 						    moneyKeyboardAlign="right"
 						    disabled
 							clear
-							value={this.state.fromData.unit}
-						><span style={{'color': '#454545', 'font-size': '16px'}}>申请人</span></InputItem>
+							value={this.state.fromData.ouName}
+						><span style={{'color': '#454545', 'fontSize': '16px'}}>申请人</span></InputItem>
 						<InputItem
 						    moneyKeyboardAlign="right"
 						    disabled
 							clear
-							value={`${this.state.fromData.startTime}至${this.state.fromData.endTime}`}
-						><span style={{'color': '#454545', 'font-size': '16px'}}>出差时间</span></InputItem>
+							value={`${this.state.fromData.createTime}至${this.state.fromData.endDate}`}
+						><span style={{'color': '#454545', 'fontSize': '16px'}}>出差时间</span></InputItem>
 						<InputItem
 						    moneyKeyboardAlign="right"
 						    disabled
 							clear
 							value={this.state.fromData.startPos}
-						><span style={{'color': '#454545', 'font-size': '16px'}}>开始地点</span></InputItem>
-						<InputItem
-						    moneyKeyboardAlign="right"
-						    disabled
-							clear
-							value={this.state.fromData.endPos}
-						><span style={{'color': '#454545', 'font-size': '16px'}}>结束地点</span></InputItem>
+						><span style={{'color': '#454545', 'fontSize': '16px'}}>出差地点</span></InputItem>
 					</List>
 					<List renderHeader={() => '出差事由'} className="my-list">
-						<List.Item wrap><span style={{'font-size': '12px'}}>{this.state.fromData.reason}</span></List.Item>
+						<List.Item wrap><span style={{'fontSize': '12px'}}>{this.state.fromData.reason}</span></List.Item>
 					</List>
-					<List renderHeader={() => '审批意见'} className="my-list">
-						<TextareaItem
-							placeholder='审批意见'
-							rows={5}
-							count={100}
-						/>
-					</List>
-					<div className="button-wrap">
-						<WhiteSpace></WhiteSpace>
-						<Button type="primary">同意</Button>
-						<WhiteSpace></WhiteSpace>
-						<Button type="primary">驳回</Button>
-						<WhiteSpace></WhiteSpace>
-						<Button type="primary">取消</Button>
-					</div>
+					{this.state.fromData.travelApplyTasks ? this.state.fromData.travelApplyTasks.map((item, index) => {
+						return (
+							<List renderHeader={() => EnumState.get(item.currentStep)} className="my-list">
+								<List.Item wrap><span style={{'fontSize': '12px'}}>{item.approvalRemark}</span></List.Item>
+							</List>
+						)
+					}) : ''}
+					{
+						Number(this.state.fromData.formStatus) < 2 ?
+						<div>
+							<List renderHeader={() => '审批意见'} className="my-list">
+								<TextareaItem
+									disabled={Number(this.state.fromData.formStatus) > 2}
+									value={this.state.fromData.approvalRemark}
+									onChange={event => this.handleChange.call(this, 'approvalRemark', event)}
+									placeholder='审批意见'
+									rows={5}
+									count={100}
+								/>
+							</List>
+							<div className="button-wrap">
+								<WhiteSpace></WhiteSpace>
+								<Button type="primary" onClick={() => this.judge.call(this, 1)}>同意</Button>
+								<WhiteSpace></WhiteSpace>
+								<Button type="primary" onClick={() => this.judge.call(this, 0)}>驳回</Button>
+							</div>
+						</div>
+						: ''
+					}
+					<WhiteSpace></WhiteSpace>
 				</div>
 			</div>
 		);
