@@ -3,6 +3,9 @@
 body {
     background: #fafafa !important;
 }
+.am-list-item .am-input-control input:disabled {
+    color: #454545 !important;
+}
 .am-textarea-control textarea {
     &::placeholder {
         font-size: 12px;

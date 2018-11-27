@@ -54,8 +54,8 @@ export default class App extends Component {
 				title: '',
 				name: '',
 				ouName: [],
-				createTime: '2018-09-01',
-				endDate: '2018-09-07',
+				startDate: '',
+				endDate: '',
 				startPos: '',
 				endPos: '',
 				reason: '',
@@ -98,7 +98,7 @@ export default class App extends Component {
 				this.state.fromData.title = data.title
 				this.state.fromData.name = data.userName
 				this.state.fromData.ouName = data.ouName
-				this.state.fromData.createTime = data.createTime
+				this.state.fromData.startDate = data.startDate
 				this.state.fromData.endDate = data.endDate
 				this.state.fromData.startPos = data.startPlace
 				this.state.fromData.reason = data.travelReason
@@ -134,7 +134,7 @@ export default class App extends Component {
 	handleDate (start, end) {
 		const startParse = new Date(start)
 		const endParse = new Date(end)
-		this.state.fromData.createTime = endParse.format('yyyy-MM-dd')
+		this.state.fromData.startDate = endParse.format('yyyy-MM-dd')
 		this.state.fromData.endDate = startParse.format('yyyy-MM-dd')
 		this.setState({fromData: this.state.fromData})
 	}
@@ -168,7 +168,7 @@ export default class App extends Component {
 						    moneyKeyboardAlign="right"
 						    disabled
 							clear
-							value={`${this.state.fromData.createTime}至${this.state.fromData.endDate}`}
+							value={`${this.state.fromData.startDate}至${this.state.fromData.endDate}`}
 						><span style={{'color': '#454545', 'fontSize': '16px'}}>出差时间</span></InputItem>
 						<InputItem
 						    moneyKeyboardAlign="right"

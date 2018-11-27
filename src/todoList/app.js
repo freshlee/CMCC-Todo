@@ -127,10 +127,8 @@ export default class App extends Component {
 					<div className="title-wrap">
 						<div className="title">出差申请</div>
 						<div className="panel">
-							<Select defaultValue={0} style={{ width: 120 }} onSelect={this.stateChange.bind(this)}>
-								<Select.Option value={0}>审批列表</Select.Option>
-								<Select.Option value={1}>已审列表</Select.Option>
-							</Select>
+							<div value={this.state.juedgeState} style={{color: (this.state.juedgeState === 0 ? '#108ee9' : '#454545')}} onClick={() => this.stateChange.call(this, 0)}>审批列表</div>
+							<div value={1} style={{color: (this.state.juedgeState === 1 ? '#108ee9' : '#454545')}} onClick={() => this.stateChange.call(this, 1)}>已审列表</div>
 						</div>
 					</div>
 					<WhiteSpace></WhiteSpace>
