@@ -1,0 +1,30 @@
+@import './antd-mobile.scss';
+@import './antd.scss';
+$theme: #108ee9;
+body {
+    background: #fafafa !important;
+}
+#root {
+    height: 100%;
+    .am-flexbox {
+        height: 100% !important;
+    }
+}
+.global {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    .header {
+    }
+    .body{
+        padding: 0.1rem .2rem;
+        flex-basis: 100%;
+        overflow: auto;
+        // height: 100%;
+        .title {
+            text-align: center;
+        }
+    }
+}

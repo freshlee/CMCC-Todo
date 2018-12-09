@@ -11,7 +11,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");//生成html文件
 const getFilePath = require("./getFilepath");
 let htmlArr = [];
 
-getFilePath("./src").map((item)=>{
+getFilePath("./src").filter(item => item === 'MultiTodoList').map((item)=>{
 	let infoJson ={},infoData={};
 	try{
 		// 读取pageinfo.json文件内容，如果在页面目录下没有找到pageinfo.json 捕获异常
@@ -30,8 +30,8 @@ getFilePath("./src").map((item)=>{
 		template: "./src/template.html",
 		filename : item == "index" ? "index.html" : `${item}/index.html`, //html位置
 		minify:{//压缩html
-			collapseWhitespace: true,
-			preserveLineBreaks: true
+			collapseWhitespace: false,
+			preserveLineBreaks: false
 		},
 	}));
 });

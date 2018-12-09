@@ -109,6 +109,10 @@ module.exports = (env, argv) => ({
 			chunkFilename: "[id].css"
 		})
 	],
+	watchOptions: {
+		aggregateTimeout: 300,
+		poll: 1000
+	},
 	optimization: {
 		minimizer: [//压缩js
 			new UglifyJsPlugin({
