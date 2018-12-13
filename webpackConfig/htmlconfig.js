@@ -11,7 +11,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");//生成html文件
 const getFilePath = require("./getFilepath");
 let htmlArr = [];
 
-getFilePath("./src").filter(item => item === 'MultiTodoList').map((item)=>{
+getFilePath("./src").filter(item => item === 'todoDetail').map((item)=>{
 	let infoJson ={},infoData={};
 	try{
 		// 读取pageinfo.json文件内容，如果在页面目录下没有找到pageinfo.json 捕获异常

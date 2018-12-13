@@ -49,6 +49,7 @@
     "postcss-loader": "^3.0.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
+    "react-imageview": "^1.2.1",
     "source-map-loader": "^0.2.4",
     "url-loader": "^1.1.2"
   }

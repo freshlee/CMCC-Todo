@@ -1,5 +1,7 @@
 @import './antd-mobile.scss';
 @import './antd.scss';
+@import './preview.scss';
+// @import '../../node_modules/react-imageview/dist/react-imageview.min.css';
 body {
     background: #fafafa !important;
 }
@@ -13,4 +15,32 @@ body {
 }
 .button-wrap {
     padding: 0 .1rem;
+}
+#imgPreview {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    display: table;
+    vertical-align:middle;
+    background-color: #454545;
+    z-index: 9999;
+    .cell {
+        display: table-cell;
+        vertical-align:middle;
+        img {
+            width: 100%;
+        }
+    }
+}
+.fileName {
+    height: 0.4rem;
+    line-height: .4rem;
+    padding-left: .15rem;
+    .right-side {
+        position: absolute;
+        right: .4rem;
+        color: #1890ff;
+    }
 }

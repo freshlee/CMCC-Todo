@@ -46,10 +46,13 @@ const EnumState = new Map()
 EnumState.set('0', '科室经理审批意见')
 EnumState.set('1', '中心领导审批意见')
 EnumState.set('2', '审批通过')
+
 export default class App extends Component {
 	constructor (props) {
 		super(props)
 		this.state = {
+			visible: false,
+			showViewer: false,
 			fromData: {
 				title: '',
 				name: '',
@@ -105,6 +108,7 @@ export default class App extends Component {
 				this.state.fromData.reason = data.travelReason
 				this.state.fromData.formStatus = data.formStatus
 				this.state.fromData.travelApplyTasks = data.travelApplyTasks
+				this.state.fromData.fileName = data.fileName
 				this.setState({
 					fromData: this.state.fromData
 				})
@@ -138,79 +142,98 @@ export default class App extends Component {
 		this.state.fromData.endDate = startParse.format('yyyy-MM-dd')
 		this.setState({fromData: this.state.fromData})
 	}
+    show() {
+		if (!this.isImg()) return
+        this.setState({ visible: true })
+    }
+    close () {
+        this.setState({ visible: false})
+	}
+	isImg () {
+		return [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/].find(reg => {
+			const res = reg.test(this.state.fromData.fileName)	
+			return res
+		})
+
+	}
 	render() {
+		const isImg = this.isImg()
 		return (
-			<div>
-				<div className="index">
-					<List renderHeader={() => '出差详情'}>
-						<InputItem
-						    moneyKeyboardAlign="right"
-						    disabled
-							clear
-							value={this.state.fromData.title}
-							onChange={(event) => this.handleChange.call(this, 'title', event)}
-							placeholder="标题"
-						><span style={{'color': '#454545', 'fontSize': '16px'}}>标题</span></InputItem>
-						<InputItem
-						    moneyKeyboardAlign="right"
-						    disabled
-							clear			
-							value={this.state.fromData.name}
-							onChange={(event) => this.handleChange.call(this, 'name', event)}
-						><span style={{'color': '#454545', 'fontSize': '16px'}}>申请人</span></InputItem>
-						<InputItem
-						    moneyKeyboardAlign="right"
-						    disabled
-							clear
-							value={this.state.fromData.ouName}
-						><span style={{'color': '#454545', 'fontSize': '16px'}}>申请人</span></InputItem>
-						<InputItem
-						    moneyKeyboardAlign="right"
-						    disabled
-							clear
-							value={`${this.state.fromData.startDate}至${this.state.fromData.endDate}`}
-						><span style={{'color': '#454545', 'fontSize': '16px'}}>出差时间</span></InputItem>
-						<InputItem
-						    moneyKeyboardAlign="right"
-						    disabled
-							clear
-							value={this.state.fromData.startPos}
-						><span style={{'color': '#454545', 'fontSize': '16px'}}>出差地点</span></InputItem>
-					</List>
-					<List renderHeader={() => '出差事由'} className="my-list">
-						<List.Item wrap><span style={{'fontSize': '12px'}}>{this.state.fromData.reason}</span></List.Item>
-					</List>
-					{this.state.fromData.travelApplyTasks ? this.state.fromData.travelApplyTasks.map((item, index) => {
-						return (
-							<List renderHeader={() => EnumState.get(item.currentStep)} className="my-list">
-								<List.Item wrap><span style={{'fontSize': '12px'}}>{item.approvalRemark}</span></List.Item>
-							</List>
-						)
-					}) : ''}
-					{
-						Number(this.state.fromData.formStatus) < 2 ?
-						<div>
-							<List renderHeader={() => '审批意见'} className="my-list">
-								<TextareaItem
-									disabled={Number(this.state.fromData.formStatus) > 2}
-									value={this.state.fromData.approvalRemark}
-									onChange={event => this.handleChange.call(this, 'approvalRemark', event)}
-									placeholder='审批意见'
-									rows={5}
-									count={100}
-								/>
-							</List>
-							<div className="button-wrap">
-								<WhiteSpace></WhiteSpace>
-								<Button type="primary" onClick={() => this.judge.call(this, 1)}>同意</Button>
-								<WhiteSpace></WhiteSpace>
-								<Button type="primary" onClick={() => this.judge.call(this, 0)}>驳回</Button>
-							</div>
+			<div className="index">
+				<List renderHeader={() => '出差详情'}>
+					<InputItem
+						moneyKeyboardAlign="right"
+						disabled
+						clear
+						value={this.state.fromData.title}
+						onChange={(event) => this.handleChange.call(this, 'title', event)}
+						placeholder="标题"
+					><span style={{'color': '#454545', 'fontSize': '16px'}}>标题</span></InputItem>
+					<InputItem
+						moneyKeyboardAlign="right"
+						disabled
+						clear			
+						value={this.state.fromData.name}
+						onChange={(event) => this.handleChange.call(this, 'name', event)}
+					><span style={{'color': '#454545', 'fontSize': '16px'}}>申请人</span></InputItem>
+					<InputItem
+						moneyKeyboardAlign="right"
+						disabled
+						clear
+						value={this.state.fromData.ouName}
+					><span style={{'color': '#454545', 'fontSize': '16px'}}>申请人</span></InputItem>
+					<InputItem
+						moneyKeyboardAlign="right"
+						disabled
+						clear
+						value={`${this.state.fromData.startDate}至${this.state.fromData.endDate}`}
+					><span style={{'color': '#454545', 'fontSize': '16px'}}>出差时间</span></InputItem>
+					<InputItem
+						moneyKeyboardAlign="right"
+						disabled
+						clear
+						value={this.state.fromData.startPos}
+					><span style={{'color': '#454545', 'fontSize': '16px'}}>出差地点</span></InputItem>
+				</List>
+				<List renderHeader={() => '出差事由'} className="my-list">
+					<List.Item wrap><span style={{'fontSize': '12px'}}>{this.state.fromData.reason}</span></List.Item>
+				</List>
+				<List renderHeader={() => '附件'} className="my-list">
+					<div className="fileName" onClick={this.show.bind(this)}><a>{this.state.fromData.fileName}</a>
+						{isImg && <span className="right-side">下载</span>}
+					</div>
+				</List>
+				{this.state.fromData.travelApplyTasks ? this.state.fromData.travelApplyTasks.map((item, index) => {
+					return (
+						<List renderHeader={() => EnumState.get(item.currentStep)} className="my-list">
+							<List.Item wrap><span style={{'fontSize': '12px'}}>{item.approvalRemark}</span></List.Item>
+						</List>
+					)
+				}) : ''}
+				{
+					Number(this.state.fromData.formStatus) < 2 ?
+					<div>
+						<List renderHeader={() => '审批意见'} className="my-list">
+							<TextareaItem
+								disabled={Number(this.state.fromData.formStatus) > 2}
+								value={this.state.fromData.approvalRemark}
+								onChange={event => this.handleChange.call(this, 'approvalRemark', event)}
+								placeholder='审批意见'
+								rows={5}
+								count={100}
+							/>
+						</List>
+						<div className="button-wrap">
+							<WhiteSpace></WhiteSpace>
+							<Button type="primary" onClick={() => this.judge.call(this, 1)}>同意</Button>
+							<WhiteSpace></WhiteSpace>
+							<Button type="primary" onClick={() => this.judge.call(this, 0)}>驳回</Button>
 						</div>
-						: ''
-					}
-					<WhiteSpace></WhiteSpace>
-				</div>
+					</div>
+					: ''
+				}
+				<WhiteSpace></WhiteSpace>
+				{this.state.visible && <div id="imgPreview" onClick={this.close.bind(this)}><div className="cell"><img src={require('./images/about.jpg')}></img></div></div>}
 			</div>
 		);
 	}

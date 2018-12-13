@@ -198,7 +198,7 @@ class RegistrationForm extends Component {
 					>
 						{getFieldDecorator('residence', {
 							initialValue: ['alibaba', 'hangzhou', 'mayun'],
-							rules: [{ type: 'array', required: true, message: 'Please select your habitual residence!' }],
+							rules: [{required: true, message: '请输入移动接口人' }],
 						})(
 							<Input />
 						)}
