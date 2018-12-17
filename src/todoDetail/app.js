@@ -51,7 +51,7 @@ export default class App extends Component {
 	constructor (props) {
 		super(props)
 		this.state = {
-			visible: false,
+			visible: true,
 			showViewer: false,
 			fromData: {
 				title: '',
@@ -109,6 +109,7 @@ export default class App extends Component {
 				this.state.fromData.formStatus = data.formStatus
 				this.state.fromData.travelApplyTasks = data.travelApplyTasks
 				this.state.fromData.fileName = data.fileName
+				this.state.fromData.fileId = data.fileId
 				this.setState({
 					fromData: this.state.fromData
 				})
@@ -158,6 +159,7 @@ export default class App extends Component {
 	}
 	render() {
 		const isImg = this.isImg()
+		const baseUrl = 'http://221.176.65.6:808/pm/fileapi/fileManagement/fileUpload/download?fileID='
 		return (
 			<div className="index">
 				<List renderHeader={() => '出差详情'}>
@@ -233,7 +235,7 @@ export default class App extends Component {
 					: ''
 				}
 				<WhiteSpace></WhiteSpace>
-				{this.state.visible && <div id="imgPreview" onClick={this.close.bind(this)}><div className="cell"><img src={require('./images/about.jpg')}></img></div></div>}
+				{this.state.visible && this.state.fromData.fileId && <div id="imgPreview" onClick={this.close.bind(this)}><div className="cell"><img src={require(`${baseUrl}${this.state.fromData.fileId}`)}></img></div></div>}
 			</div>
 		);
 	}

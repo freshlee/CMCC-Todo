@@ -14,7 +14,7 @@ const getFilePath = require("./getFilepath");
  */
 module.exports = function getEnty(path){
 	let entry = {};
-	getFilePath(path).filter(item => item === 'todoDetail').map((item)=>{
+	getFilePath(path).filter(item => (item === 'todoDetail' || item === 'todoList')).map((item)=>{
 		/**
 		 * 下面输出格式为{"about/about":".src/aobout/index.js"}
 		 * 这样目的是为了将js打包到对应的文件夹下
