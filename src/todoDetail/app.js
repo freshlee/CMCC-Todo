@@ -159,7 +159,7 @@ export default class App extends Component {
 	}
 	render() {
 		const isImg = this.isImg()
-		const baseUrl = 'http://221.176.65.6:808/pm/fileapi/fileManagement/fileUpload/download?fileID='
+		const baseUrl = 'http://221.176.65.6:808/pm/fileapi/fileManagement/fileUpload/download?fileId='
 		return (
 			<div className="index">
 				<List renderHeader={() => '出差详情'}>
