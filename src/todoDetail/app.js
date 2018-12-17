@@ -51,7 +51,7 @@ export default class App extends Component {
 	constructor (props) {
 		super(props)
 		this.state = {
-			visible: true,
+			visible: false,
 			showViewer: false,
 			fromData: {
 				title: '',
@@ -160,6 +160,9 @@ export default class App extends Component {
 	render() {
 		const isImg = this.isImg()
 		const baseUrl = 'http://221.176.65.6:808/pm/fileapi/fileManagement/fileUpload/download?fileId='
+		const downLoad = (url) => {
+			window.open(url)
+		}
 		return (
 			<div className="index">
 				<List renderHeader={() => '出差详情'}>
@@ -201,8 +204,10 @@ export default class App extends Component {
 					<List.Item wrap><span style={{'fontSize': '12px'}}>{this.state.fromData.reason}</span></List.Item>
 				</List>
 				<List renderHeader={() => '附件'} className="my-list">
-					<div className="fileName" onClick={this.show.bind(this)}><a>{this.state.fromData.fileName}</a>
-						{isImg && <span className="right-side">下载</span>}
+					<div className="fileName"><a onClick={this.show.bind(this)}>{this.state.fromData.fileName}</a>
+						{isImg && <span className="right-side">
+						<a href={`${baseUrl}${this.state.fromData.fileId}`}>下载</a>
+						</span>}
 					</div>
 				</List>
 				{this.state.fromData.travelApplyTasks ? this.state.fromData.travelApplyTasks.map((item, index) => {
@@ -235,7 +240,7 @@ export default class App extends Component {
 					: ''
 				}
 				<WhiteSpace></WhiteSpace>
-				{this.state.visible && this.state.fromData.fileId && <div id="imgPreview" onClick={this.close.bind(this)}><div className="cell"><img src={require(`${baseUrl}${this.state.fromData.fileId}`)}></img></div></div>}
+				{this.state.visible && this.state.fromData.fileId && <div id="imgPreview" onClick={this.close.bind(this)}><div className="cell"><img src={`${baseUrl}${this.state.fromData.fileId}`}></img></div></div>}
 			</div>
 		);
 	}
